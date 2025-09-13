@@ -3,60 +3,56 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'
+        PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Microsoft\\WindowsApps\\python-3.12.4-amd64.exe' // путь к Python на Windows
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo 'Cloning repository...'
-                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                echo "Cloning repository for branch ${env.BRANCH_NAME}..."
+                git branch: "${env.BRANCH_NAME}", 
+                    url: 'https://github.com/Veronika-Gerasimova/lab1_dev', 
+                    credentialsId: 'github-token'
             }
         }
 
         stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
-                bat "python -m venv %VENV_DIR%"
-                bat "%VENV_DIR%\\Scripts\\pip install --upgrade pip"
-                bat "%VENV_DIR%\\Scripts\\pip install -r requirements.txt"
+                bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
+                bat "%VENV_DIR%\\Scripts\\pip.exe install --upgrade pip"
+                bat "%VENV_DIR%\\Scripts\\pip.exe install -r requirements.txt"
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running Django tests...'
-                bat "%VENV_DIR%\\Scripts\\python manage.py test"
+                bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
         stage('Collect Static Files') {
             steps {
                 echo 'Collecting static files...'
-                bat "%VENV_DIR%\\Scripts\\python manage.py collectstatic --noinput"
+                bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
         stage('Deploy Locally') {
             when {
-                branch 'main'  // Деплой только из ветки main
+                expression { env.BRANCH_NAME == 'main' } // деплой только из main
             }
             steps {
                 echo 'Starting local Django server...'
-                // запуск сервера в фоне
-                bat "start /B %VENV_DIR%\\Scripts\\python manage.py runserver 0.0.0.0:8000"
+                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished.'
-        }
-        success {
-            echo 'Build and tests succeeded!'
-        }
-        failure {
-            echo 'Build or tests failed!'
-        }
+        always { echo 'Pipeline finished.' }
+        success { echo 'Build and tests succeeded!' }
+        failure { echo 'Build or tests failed!' }
     }
 }
