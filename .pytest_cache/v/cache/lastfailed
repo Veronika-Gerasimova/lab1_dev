@@ -1,0 +1,4 @@
+{
+  "transportation/tests.py::ClientViewsetTestCase::test_list": true,
+  "transportation/tests.py::ClientViewsetTestCase::test_get_list": true
+}

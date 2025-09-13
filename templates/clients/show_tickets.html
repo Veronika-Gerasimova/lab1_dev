@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Билеты</title>
+</head>
+<body>
+  <h1>Список билетов</h1>
+  <ul>
+      {% for ticket in tickets %}
+          <li>Клиент: {{ ticket.client.name }}<br>
+              Номер рейса: {{ ticket.flight.flight_number }}<br>
+              Номер места: {{ ticket.seat_number }}<br>
+              Дата покупки: {{ ticket.purchase_date }}
+          </li>
+      {% endfor %}
+  </ul>
+</body>
+</html>

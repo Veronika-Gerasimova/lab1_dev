@@ -1,0 +1,22 @@
+[
+  "transportation/tests.py::AirplanesViewSetTestCase::test_create_airplane",
+  "transportation/tests.py::AirplanesViewSetTestCase::test_delete_airplane",
+  "transportation/tests.py::AirplanesViewSetTestCase::test_get_list",
+  "transportation/tests.py::AirplanesViewSetTestCase::test_update_airplane",
+  "transportation/tests.py::BaggagesViewSetTestCase::test_create_baggage",
+  "transportation/tests.py::BaggagesViewSetTestCase::test_delete_baggage",
+  "transportation/tests.py::BaggagesViewSetTestCase::test_get_list",
+  "transportation/tests.py::BaggagesViewSetTestCase::test_update_baggage",
+  "transportation/tests.py::ClientViewSetTestCase::test_create_client",
+  "transportation/tests.py::ClientViewSetTestCase::test_delete_client",
+  "transportation/tests.py::ClientViewSetTestCase::test_get_list",
+  "transportation/tests.py::ClientViewSetTestCase::test_update_client",
+  "transportation/tests.py::FlightsViewSetTestCase::test_create_flight",
+  "transportation/tests.py::FlightsViewSetTestCase::test_delete_flight",
+  "transportation/tests.py::FlightsViewSetTestCase::test_get_list",
+  "transportation/tests.py::FlightsViewSetTestCase::test_update_flight",
+  "transportation/tests.py::TicketsViewSetTestCase::test_create_ticket",
+  "transportation/tests.py::TicketsViewSetTestCase::test_delete_ticket",
+  "transportation/tests.py::TicketsViewSetTestCase::test_get_list",
+  "transportation/tests.py::TicketsViewSetTestCase::test_update_ticket"
+]

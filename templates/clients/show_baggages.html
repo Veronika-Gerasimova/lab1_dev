@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Багаж</title>
+</head>
+<body>
+  <h1>Список багажа</h1>
+  <ul>
+      {% for baggage in baggages %}
+          <li>Билет (Клиент: {{ baggage.ticket.client.name }}):<br>
+              Вес багажа: {{ baggage.weight }} кг<br>
+              Тип багажа: {{ baggage.baggage_type }}
+          </li>
+      {% endfor %}
+  </ul>
+</body>
+</html>

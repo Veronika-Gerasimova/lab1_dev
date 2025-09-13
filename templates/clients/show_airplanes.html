@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Самолеты</title>
+</head>
+<body>
+  <h1>Список самолетов</h1>
+  <ul>
+      {% for airplane in airplanes %}
+          <li>Бортовой номер: {{ airplane.tail_number }}<br>
+              Модель: {{ airplane.model }}<br>
+              Вместимость: {{ airplane.capacity }} пассажиров<br>
+              Номер рейса: {{ airplane.flight.flight_number }}
+          </li>
+      {% endfor %}
+  </ul>
+</body>
+</html>
