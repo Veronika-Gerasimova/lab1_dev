@@ -9,30 +9,30 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Cloning repository...'
-                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev'
+                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
         stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
-                sh 'python -m venv ${VENV_DIR}'
-                sh '${VENV_DIR}/Scripts/pip install --upgrade pip'
-                sh '${VENV_DIR}/Scripts/pip install -r requirements.txt'
+                bat "python -m venv %VENV_DIR%"
+                bat "%VENV_DIR%\\Scripts\\pip install --upgrade pip"
+                bat "%VENV_DIR%\\Scripts\\pip install -r requirements.txt"
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running Django tests...'
-                sh '${VENV_DIR}/Scripts/python manage.py test'
+                bat "%VENV_DIR%\\Scripts\\python manage.py test"
             }
         }
 
         stage('Collect Static Files') {
             steps {
                 echo 'Collecting static files...'
-                sh '${VENV_DIR}/Scripts/python manage.py collectstatic --noinput'
+                bat "%VENV_DIR%\\Scripts\\python manage.py collectstatic --noinput"
             }
         }
 
@@ -42,8 +42,8 @@ pipeline {
             }
             steps {
                 echo 'Starting local Django server...'
-                // для локального теста можно запускать сервер в фоне
-                sh '${VENV_DIR}/Scripts/python manage.py runserver 0.0.0.0:8000 &'
+                // запуск сервера в фоне
+                bat "start /B %VENV_DIR%\\Scripts\\python manage.py runserver 0.0.0.0:8000"
             }
         }
     }
