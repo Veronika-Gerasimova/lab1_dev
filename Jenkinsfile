@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Cloning repository...'
-                git branch: 'main', url: 'https://github.com/username/repo.git'
+                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev'
             }
         }
 
