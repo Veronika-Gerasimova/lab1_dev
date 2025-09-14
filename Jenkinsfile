@@ -38,7 +38,7 @@ pipeline {
 
         stage('Deploy Locally') {
             when {
-                branch 'main'  // Деплой только из ветки main
+                branch 'feature/new-feature'  // Деплой только из ветки main
             }
             steps {
                 echo 'Starting local Django server...'
