@@ -22,17 +22,16 @@ pipeline {
             }
         }
 
-        stage('Setup Python Environment') {
+       stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
-                bat "%VENV_DIR%\\Scripts\\pip.exe install --upgrade pip"
-                
-                // Установка всех нужных пакетов
-                bat "%VENV_DIR%\\Scripts\\pip.exe install -r requirements.txt"
-                bat "%VENV_DIR%\\Scripts\\pip.exe install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
             }
         }
+
 
         stage('Run Tests') {
             steps {
