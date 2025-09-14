@@ -29,6 +29,7 @@ pipeline {
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install Pillow"
             }
         }
 
