@@ -49,9 +49,6 @@ pipeline {
         }
 
         stage('Deploy Locally') {
-            when {
-                expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'feature/new-feature' }
-            }
             steps {
                 echo 'Starting local Django server...'
                 bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
