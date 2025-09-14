@@ -1,10 +1,9 @@
-
 pipeline {
     agent any
 
     environment {
         VENV_DIR = 'venv'
-        PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Microsoft\\WindowsApps\\python-3.12.4-amd64.exe' // путь к Python на Windows
+        PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
     }
 
     stages {
@@ -13,6 +12,7 @@ pipeline {
                 echo 'Jenkinsfile действительно выполняется!'
             }
         }
+
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
@@ -27,7 +27,10 @@ pipeline {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "%VENV_DIR%\\Scripts\\pip.exe install --upgrade pip"
+                
+                // Установка всех нужных пакетов
                 bat "%VENV_DIR%\\Scripts\\pip.exe install -r requirements.txt"
+                bat "%VENV_DIR%\\Scripts\\pip.exe install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
             }
         }
 
