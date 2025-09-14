@@ -16,7 +16,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'dev', 
+                git branch: 'feature/new-feature', 
                     url: 'https://github.com/Veronika-Gerasimova/lab1_dev', 
                     credentialsId: 'github-token'
             }
