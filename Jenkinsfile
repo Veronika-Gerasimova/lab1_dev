@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                echo 'Jenkinsfile действительно выполняется!'
+                echo 'Jenkinsfile start'
             }
         }
 
@@ -50,7 +50,7 @@ pipeline {
 
         stage('Deploy Locally') {
             when {
-                expression { env.BRANCH_NAME == 'main' } // деплой только из main
+                expression { env.BRANCH_NAME == 'feature/new-feature' } // деплой только из main
             }
             steps {
                 echo 'Starting local Django server...'
