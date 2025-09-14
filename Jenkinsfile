@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -7,6 +8,11 @@ pipeline {
     }
 
     stages {
+        stage('Test') {
+            steps {
+                echo 'Jenkinsfile действительно выполняется!'
+            }
+        }
         stage('Checkout') {
             steps {
                 echo "Cloning repository for branch ${env.BRANCH_NAME}..."
