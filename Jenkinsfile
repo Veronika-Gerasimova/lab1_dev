@@ -50,7 +50,7 @@ pipeline {
 
         stage('Deploy Locally') {
             when {
-                expression { env.BRANCH_NAME == 'feature/new-feature' } // деплой только из main
+                expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'feature/new-feature' }
             }
             steps {
                 echo 'Starting local Django server...'
