@@ -4,6 +4,8 @@ pipeline {
     environment {
         VENV_DIR = 'venv'
         PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
+        NODE_HOME = 'C:\\Program Files\\nodejs'   // путь к Node.js
+        PATH = "${NODE_HOME};${env.PATH}"
     }
 
     stages {
@@ -22,7 +24,7 @@ pipeline {
             }
         }
 
-       stage('Setup Python Environment') {
+        stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
@@ -32,7 +34,6 @@ pipeline {
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install Pillow"
             }
         }
-
 
         stage('Run Tests') {
             steps {
@@ -48,13 +49,24 @@ pipeline {
             }
         }
 
-        stage('Deploy Locally') {
+        stage('Deploy Backend') {
             steps {
                 echo 'Starting local Django server...'
                 bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
             }
         }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo 'Starting npm frontend...'
+                dir('plane') {   
+                    bat 'npm install'
+                    bat 'start cmd /c npm run dev'
+                }
+            }
+        }
     }
+
     post {
         always { echo 'Pipeline finished.' }
         success { echo 'Build and tests succeeded!' }
