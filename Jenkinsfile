@@ -4,17 +4,11 @@ pipeline {
     environment {
         VENV_DIR = 'venv'
         PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
-        NODE_HOME = 'C:\\Program Files\\nodejs'   // путь к Node.js
+        NODE_HOME = 'C:\\Program Files\\nodejs'
         PATH = "${NODE_HOME};${env.PATH}"
     }
 
     stages {
-        stage('Test') {
-            steps {
-                echo 'Jenkinsfile start'
-            }
-        }
-
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
@@ -30,8 +24,14 @@ pipeline {
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install Pillow"
+            }
+        }
+
+        stage('Install Frontend Dependencies') {
+            steps {
+                dir('plane') {
+                    bat 'npm install'
+                }
             }
         }
 
@@ -44,25 +44,25 @@ pipeline {
 
         stage('Collect Static Files') {
             steps {
-                echo 'Collecting static files...'
+                echo 'Collecting Django static files...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy Backend') {
+        stage('Build Frontend') {
             steps {
-                echo 'Starting local Django server...'
-                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
+                echo 'Building frontend for production...'
+                dir('plane') {
+                    bat 'npm run build'
+                }
             }
         }
 
-        stage('Deploy Frontend') {
+        stage('Deploy') {
             steps {
-                echo 'Starting npm frontend...'
-                dir('plane') {   
-                    bat 'npm install'
-                    bat 'start cmd /c npm run dev'
-                }
+                echo 'Deploying backend and frontend...'
+                // Запускаем сервер Django с указанием порта
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
