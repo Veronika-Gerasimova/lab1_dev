@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
@@ -65,7 +65,6 @@ pipeline {
                 bat '''
                 echo Adding frontend serving configuration to settings.py...
                 '''
-                // Убедитесь, что в settings.py есть настройки для статических файлов
             }
         }
 
@@ -86,7 +85,7 @@ pipeline {
         }
         success {
             echo '=== DEPLOYMENT SUCCESSFUL ==='
-            echo 'Application is running at: http://localhost:8000'
+            echo 'Application is running at: http://192.168.0.1:8000'
             echo 'Frontend should be served by Django'
             echo '============================='
         }
