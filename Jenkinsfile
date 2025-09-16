@@ -16,17 +16,6 @@ pipeline {
             }
         }
 
-        stage('Merge feature branch') {
-            steps {
-                echo "Merging feature/new-feature into main..."
-                bat """
-                git fetch origin feature/new-feature
-                git checkout main
-                git merge origin/feature/new-feature --no-edit
-                """
-            }
-        }
-
         stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
