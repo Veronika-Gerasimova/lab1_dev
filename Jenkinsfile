@@ -57,7 +57,7 @@ pipeline {
                 bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
 
                 // Запускаем фронтенд dev-сервер (React/Vue)
-                dir('frontend') {
+                dir('plane') {
                     bat "start cmd /c \"npm start\""
                 }
             }
