@@ -4,8 +4,6 @@ pipeline {
     environment {
         VENV_DIR = 'venv'
         PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
-        NODE_HOME = 'C:\\Program Files\\nodejs'
-        PATH = "${NODE_HOME};${env.PATH}"
     }
 
     stages {
@@ -37,21 +35,11 @@ pipeline {
             }
         }
 
-        stage('Install Frontend') {
+        stage('Run Django Backend') {
             steps {
-                dir('plane') {
-                    bat 'npm install'
-                }
+                // Запускаем Django на порту 8000
+                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
-        }
-
-        stage('Run Backend and Frontend') {
-                stage('Run Django Backend') {
-                    steps {
-                        // Запускаем Django на порту 8000
-                        bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
-                    }
-                }
         }
     }
 
