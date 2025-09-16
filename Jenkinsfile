@@ -27,41 +27,45 @@ pipeline {
             }
         }
 
-        stage('Install Frontend Dependencies') {
-            steps {
-                dir('plane') {
-                    bat 'npm install'
-                }
-            }
-        }
-
-        stage('Run Tests') {
+        stage('Run Django Tests') {
             steps {
                 echo 'Running Django tests...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
-        stage('Collect Static Files') {
+        stage('Collect Django Static Files') {
             steps {
                 echo 'Collecting Django static files...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
+        stage('Install Frontend Dependencies') {
+            steps {
+                dir('plane') {
+                    echo 'Cleaning node_modules and installing frontend dependencies...'
+                    bat 'rmdir /s /q node_modules || echo node_modules not found'
+                    bat 'npm ci'
+                    bat 'node -v'
+                    bat 'npm -v'
+                }
+            }
+        }
+
         stage('Build Frontend') {
             steps {
-                echo 'Building frontend for production...'
                 dir('plane') {
+                    echo 'Building frontend for production...'
                     bat 'npm run build'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Backend') {
             steps {
-                echo 'Deploying backend and frontend...'
-                // Запускаем сервер Django с указанием порта
+                echo 'Starting Django backend...'
+                // Можно оставить просто runserver для локального теста
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
