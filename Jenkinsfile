@@ -46,21 +46,12 @@ pipeline {
         }
 
         stage('Run Backend and Frontend') {
-            parallel {
                 stage('Run Django Backend') {
                     steps {
                         // Запускаем Django на порту 8000
                         bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
                     }
-                }
-                stage('Run Frontend Dev') {
-                    steps {
-                        dir('plane') {
-                            // Запускаем Vite dev сервер на порту 5173
-                            bat "start cmd /c npm run dev"
-                        }
-                    }
-                }
+        
             }
         }
     }
