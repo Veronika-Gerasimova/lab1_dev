@@ -41,36 +41,9 @@ pipeline {
             }
         }
 
-        stage('Install Frontend Dependencies') {
-            steps {
-                dir('plane') {
-                    echo 'Cleaning node_modules and installing frontend dependencies...'
-                    // Очистка старых модулей (не критично, если нет)
-                    bat 'if exist node_modules rmdir /s /q node_modules'
-                    
-                    // Устанавливаем зависимости строго по package-lock.json
-                    bat 'npm ci'
-                    
-                    // Проверка версий
-                    bat 'node -v'
-                    bat 'npm -v'
-                }
-            }
-        }
-        
-        stage('Build Frontend') {
-            steps {
-                dir('plane') {
-                    echo 'Building frontend for production...'
-                    bat 'npm run build'
-                }
-            }
-        }
-
         stage('Deploy Backend') {
             steps {
                 echo 'Starting Django backend...'
-                // Можно оставить просто runserver для локального теста
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
