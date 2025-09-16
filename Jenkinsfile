@@ -28,14 +28,16 @@ pipeline {
         stage('Build Vue Frontend') {
             steps {
                 echo 'Building Vue frontend...'
-                dir('plane') {  // папка с Vue проектом
+                dir('plane') {
                     bat "npm install"
                     bat "npm run build"
                 }
-                echo 'Copying Vue build to Django static...'
+                echo 'Copying Vue build to Django...'
                 bat "xcopy /s /y plane\\dist\\* app\\static\\"
+                bat "xcopy /y plane\\dist\\index.html app\\templates\\"
             }
         }
+
 
         stage('Run Django Tests') {
             steps {
