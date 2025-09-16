@@ -17,27 +17,9 @@ pipeline {
             }
         }
 
-        stage('Setup Frontend') {
-            steps {
-                echo 'Setting up Node.js dependencies...'
-                dir(env.FRONTEND_DIR) {
-                    bat 'npm install'
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                echo 'Building frontend for production...'
-                dir(env.FRONTEND_DIR) {
-                    bat 'npm run build'
-                }
-            }
-        }
-
         stage('Setup Python Environment') {
             steps {
-                echo 'Setting up virtual environment...'
+                echo 'Setting up Python virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
@@ -51,29 +33,31 @@ pipeline {
             }
         }
 
-        stage('Collect Static Files') {
+        stage('Setup Frontend') {
             steps {
-                echo 'Collecting Django static files...'
-                bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
+                echo 'Installing Node.js dependencies for frontend...'
+                dir(env.FRONTEND_DIR) {
+                    bat 'npm install'
+                }
             }
         }
 
-        stage('Configure Django for Frontend') {
-            steps {
-                echo 'Configuring Django to serve frontend...'
-                // Создаем шаблон для обслуживания фронтенда через Django
-                bat '''
-                echo Adding frontend serving configuration to settings.py...
-                '''
-            }
-        }
+        stage('Run Backend and Frontend in Dev Mode') {
+            parallel {
+                stage('Run Django Backend') {
+                    steps {
+                        echo 'Starting Django backend...'
+                        bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                    }
+                }
 
-        stage('Deploy Application') {
-            steps {
-                echo 'Starting Django server with frontend...'
-                script {
-                    // Запускаем Django который будет обслуживать и фронтенд и бэкенд
-                    bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                stage('Run Vue Dev Server') {
+                    steps {
+                        echo 'Starting Vue frontend dev server...'
+                        dir(env.FRONTEND_DIR) {
+                            bat "start cmd /c \"npm run dev -- --host 0.0.0.0\""
+                        }
+                    }
                 }
             }
         }
@@ -84,10 +68,10 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo '=== DEPLOYMENT SUCCESSFUL ==='
-            echo 'Application is running at: http://192.168.0.1:8000'
-            echo 'Frontend should be served by Django'
-            echo '============================='
+            echo '=== DEV ENVIRONMENT RUNNING ==='
+            echo 'Django backend: http://<IP_PC>:8000'
+            echo 'Vue frontend dev server: http://<IP_PC>:5173'
+            echo 'Make sure Windows Firewall allows these ports!'
         }
         failure {
             echo 'Build or deployment failed!'
