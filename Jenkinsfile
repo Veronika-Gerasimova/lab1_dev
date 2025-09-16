@@ -46,7 +46,6 @@ pipeline {
                 dir('plane') {
                     echo 'Cleaning node_modules and installing frontend dependencies...'
                     bat 'rmdir /s /q node_modules || echo node_modules not found'
-                    bat 'del package-lock.json || echo package-lock.json not found'
                     bat 'npm ci'
                     bat 'node -v'
                     bat 'npm -v'
