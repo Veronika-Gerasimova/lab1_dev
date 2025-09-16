@@ -45,14 +45,19 @@ pipeline {
             steps {
                 dir('plane') {
                     echo 'Cleaning node_modules and installing frontend dependencies...'
-                    bat 'rmdir /s /q node_modules || echo node_modules not found'
+                    // Очистка старых модулей (не критично, если нет)
+                    bat 'if exist node_modules rmdir /s /q node_modules'
+                    
+                    // Устанавливаем зависимости строго по package-lock.json
                     bat 'npm ci'
+                    
+                    // Проверка версий
                     bat 'node -v'
                     bat 'npm -v'
                 }
             }
         }
-
+        
         stage('Build Frontend') {
             steps {
                 dir('plane') {
