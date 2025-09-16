@@ -54,7 +54,7 @@ pipeline {
                 bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
             }
         }
-
+    }
     post {
         always { echo 'Pipeline finished.' }
         success { echo 'Build and tests succeeded!' }
