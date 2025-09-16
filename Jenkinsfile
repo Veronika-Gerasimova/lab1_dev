@@ -66,7 +66,7 @@ pipeline {
             steps {
                 echo 'Starting Django backend...'
                 // Можно оставить просто runserver для локального теста
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8080"
             }
         }
     }
