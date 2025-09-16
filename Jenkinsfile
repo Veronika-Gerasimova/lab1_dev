@@ -18,7 +18,7 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
-                echo 'Setting up Python virtual environment...'
+                echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
@@ -39,27 +39,10 @@ pipeline {
             }
         }
 
-        stage('Build Frontend') {
+        stage('Deploy Backend') {
             steps {
-                dir('plane') {
-                    echo 'Installing frontend dependencies...'
-                    bat 'npm install'
-                    echo 'Building frontend...'
-                    bat 'npm run build'
-                }
-            }
-        }
-
-        stage('Run Backend and Frontend') {
-            steps {
-                echo 'Starting Django backend and frontend...'
-                // Запускаем Django в отдельном потоке
-                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
-
-                // Запускаем фронтенд dev-сервер (React/Vue)
-                dir('plane') {
-                    bat "start cmd /c \"npm start\""
-                }
+                echo 'Starting Django backend...'
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
@@ -69,10 +52,10 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build and deployment succeeded!'
+            echo 'Build and tests succeeded!'
         }
         failure {
-            echo 'Build or deployment failed!'
+            echo 'Build or tests failed!'
         }
     }
 }
