@@ -7,24 +7,32 @@ pipeline {
     }
 
     stages {
-        stage('Checkout main') {
+        stage('Test') {
             steps {
-                echo "Cloning repository (main)..."
-                git branch: 'main',
-                    url: 'https://github.com/Veronika-Gerasimova/lab1_dev',
+                echo 'Jenkinsfile start'
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                echo "Cloning repository..."
+                git branch: 'feature/new-feature', 
+                    url: 'https://github.com/Veronika-Gerasimova/lab1_dev', 
                     credentialsId: 'github-token'
             }
         }
 
-        stage('Setup Python Environment') {
+       stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework Pillow"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install django-cors-headers qrcode python-docx openpyxl pyotp djangorestframework"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install Pillow"
             }
         }
+
 
         stage('Run Tests') {
             steps {
@@ -43,15 +51,7 @@ pipeline {
         stage('Deploy Locally') {
             steps {
                 echo 'Starting local Django server...'
-                // запустим на всех интерфейсах, чтобы телефон в сети видел
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
-            }
-        }
-
-        stage('Expose via ngrok') {
-            steps {
-                echo 'Starting ngrok tunnel...'
-                bat "ngrok http 8000"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 192.168.0.102:8000\""
             }
         }
     }
