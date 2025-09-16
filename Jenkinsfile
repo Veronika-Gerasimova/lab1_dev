@@ -35,12 +35,11 @@ pipeline {
             }
         }
 
-        stage('Run Django Backend') {
+         stage('Deploy Backend') {
             steps {
-                // Запускаем Django на порту 8000
-                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                echo 'Starting Django backend...'
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
-        }
     }
 
     post {
