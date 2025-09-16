@@ -11,16 +11,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo "Cloning repository..."
-                git branch: 'feature/new-feature', 
-                    url: 'https://github.com/Veronika-Gerasimova/lab1_dev', 
+                git branch: 'feature/new-feature',
+                    url: 'https://github.com/Veronika-Gerasimova/lab1_dev',
                     credentialsId: 'github-token'
             }
         }
 
         stage('Setup Python Environment') {
             steps {
-                echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
@@ -29,22 +27,40 @@ pipeline {
 
         stage('Run Django Tests') {
             steps {
-                echo 'Running Django tests...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
         stage('Collect Django Static Files') {
             steps {
-                echo 'Collecting Django static files...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy Backend') {
+        stage('Install Frontend') {
             steps {
-                echo 'Starting Django backend...'
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                dir('plane') {
+                    bat 'npm install'
+                }
+            }
+        }
+
+        stage('Run Backend and Frontend') {
+            parallel {
+                stage('Run Django Backend') {
+                    steps {
+                        // Запускаем Django на порту 8000
+                        bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                    }
+                }
+                stage('Run Frontend Dev') {
+                    steps {
+                        dir('plane') {
+                            // Запускаем Vite dev сервер на порту 5173
+                            bat "start cmd /c npm run dev"
+                        }
+                    }
+                }
             }
         }
     }
