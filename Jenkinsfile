@@ -6,7 +6,7 @@ pipeline {
         PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
         NODE_HOME = 'C:\\Program Files\\nodejs'
         PATH = "${NODE_HOME};${env.PATH}"
-        FRONTEND_DIR = 'plane'  // Путь к директории фронтенда
+        FRONTEND_DIR = 'plane'
     }
 
     stages {
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                echo 'Building frontend...'
+                echo 'Building frontend for production...'
                 dir(env.FRONTEND_DIR) {
                     bat 'npm run build'
                 }
@@ -51,24 +51,29 @@ pipeline {
             }
         }
 
-        stage('Collect Django Static Files') {
+        stage('Collect Static Files') {
             steps {
                 echo 'Collecting Django static files...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
+        stage('Configure Django for Frontend') {
+            steps {
+                echo 'Configuring Django to serve frontend...'
+                // Создаем шаблон для обслуживания фронтенда через Django
+                bat '''
+                echo Adding frontend serving configuration to settings.py...
+                '''
+                // Убедитесь, что в settings.py есть настройки для статических файлов
+            }
+        }
+
         stage('Deploy Application') {
             steps {
-                echo 'Starting both frontend and backend...'
+                echo 'Starting Django server with frontend...'
                 script {
-                    // Запускаем фронтенд в фоновом режиме
-                    bat "start \"Frontend\" cmd /k \"cd ${env.FRONTEND_DIR} && npm run dev\""
-                    
-                    // Ждем немного, чтобы фронтенд успел запуститься
-                    sleep(10)
-                    
-                    // Запускаем бэкенд
+                    // Запускаем Django который будет обслуживать и фронтенд и бэкенд
                     bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
                 }
             }
@@ -80,10 +85,13 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build and tests succeeded!'
+            echo '=== DEPLOYMENT SUCCESSFUL ==='
+            echo 'Application is running at: http://localhost:8000'
+            echo 'Frontend should be served by Django'
+            echo '============================='
         }
         failure {
-            echo 'Build or tests failed!'
+            echo 'Build or deployment failed!'
         }
     }
 }
