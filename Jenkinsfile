@@ -41,7 +41,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('frontend') {
+                dir('plane') {
                     echo 'Installing frontend dependencies...'
                     bat 'npm install'
                     echo 'Building frontend...'
