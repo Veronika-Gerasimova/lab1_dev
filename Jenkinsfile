@@ -51,7 +51,7 @@ pipeline {
         stage('Deploy Locally') {
             steps {
                 echo 'Starting local Django server...'
-                bat "start cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 192.168.0.102:8000\""
+                bat "\"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 192.168.0.102:8000\""
             }
         }
     }
