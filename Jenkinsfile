@@ -19,10 +19,14 @@ pipeline {
         stage('Merge Latest Changes') {
             steps {
                 echo 'Merging latest changes from main branch...'
+                // Настраиваем identity для Git
+                bat 'git config user.email "geras-veronika@rambler.ru"'
+                bat 'git config user.name "veronika"'
                 bat 'git fetch origin'
                 bat 'git merge origin/main'
             }
         }
+
 
         stage('Setup Python Environment') {
             steps {
