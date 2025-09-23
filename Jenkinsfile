@@ -3,47 +3,54 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'
+        PYTHON_PATH = 'C:\\Users\\geras\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
+        NODE_HOME = 'C:\\Program Files\\nodejs'
+        PATH = "${NODE_HOME};${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo 'Cloning repository...'
-                git branch: 'dev', url: 'https://github.com/Veronika-Gerasimova/lab1_dev'
+                echo "Cloning repository..."
+                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+            }
+        }
+
+        stage('Merge Latest Changes') {
+            steps {
+                echo 'Merging latest changes from main branch...'
+                bat 'git fetch origin'
+                bat 'git merge origin/main'
             }
         }
 
         stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
-                sh 'python -m venv ${VENV_DIR}'
-                sh '${VENV_DIR}/Scripts/pip install --upgrade pip'
-                sh '${VENV_DIR}/Scripts/pip install -r requirements.txt'
+                bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Django Tests') {
             steps {
                 echo 'Running Django tests...'
-                sh '${VENV_DIR}/Scripts/python manage.py test'
+                bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
-        stage('Collect Static Files') {
+        stage('Collect Django Static Files') {
             steps {
-                echo 'Collecting static files...'
-                sh '${VENV_DIR}/Scripts/python manage.py collectstatic --noinput'
+                echo 'Collecting Django static files...'
+                bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy Locally') {
-            when {
-                branch 'feature/new-feature'  // Деплой только из ветки main
-            }
+        stage('Deploy Backend') {
             steps {
-                echo 'Starting local Django server...'
-                // для локального теста можно запускать сервер в фоне
-                sh '${VENV_DIR}/Scripts/python manage.py runserver 0.0.0.0:8000 &'
+                echo 'Starting Django backend...'
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
