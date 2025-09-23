@@ -102,7 +102,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Добавьте папку с собранным фронтендом в статические файлы
 STATICFILES_DIRS = [
-    FRONTEND_DIR,
+    os.path.join(BASE_DIR, "static"),
 ]
 
 LOGGING = {
