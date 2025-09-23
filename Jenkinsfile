@@ -16,6 +16,14 @@ pipeline {
             }
         }
 
+        stage('Merge Latest Changes') {
+            steps {
+                echo 'Merging latest changes from main branch...'
+                bat 'git fetch origin'
+                bat 'git merge origin/main'
+            }
+        }
+
         stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
