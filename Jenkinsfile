@@ -8,11 +8,16 @@ pipeline {
         PATH = "${NODE_HOME};${env.PATH}"
     }
 
+    triggers {
+        // Автозапуск на каждый коммит (при настройке GitHub Webhook)
+        githubPush()
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
@@ -40,6 +45,8 @@ pipeline {
                     echo 'Building frontend...'
                     bat "npm run build"
                 }
+                // копируем билд во фронт-статик Django
+                bat "xcopy /E /I /Y plane\\dist static\\frontend"
             }
         }
 
@@ -53,6 +60,7 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 echo 'Starting Django backend...'
+                // запускаем как демон, чтобы пайплайн не блокировался
                 bat "start /B %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"
             }
         }
@@ -63,10 +71,10 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build and tests succeeded!'
+            echo '✅ Build and deploy succeeded!'
         }
         failure {
-            echo 'Build or tests failed!'
+            echo '❌ Build or tests failed!'
         }
     }
 }
