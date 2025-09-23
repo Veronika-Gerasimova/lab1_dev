@@ -16,32 +16,12 @@ pipeline {
             }
         }
 
-        stage('Merge Latest Changes') {
-            steps {
-                echo 'Merging latest changes from main branch...'
-                bat 'git config --global user.email "geras-veronika@rambler.ru"'
-                bat 'git config --global user.name "veronika"'
-                bat 'git fetch origin'
-                bat 'git merge origin/main'
-            }
-        }
-
         stage('Setup Python Environment') {
             steps {
-                echo 'Setting up Python virtual environment...'
+                echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
-            }
-        }
-
-        stage('Run Frontend') {
-            steps {
-                echo 'Starting frontend in background...'
-                dir('plane') {
-                    // Устанавливаем зависимости и запускаем npm dev-сервер в фоне
-                    bat 'start /B cmd /c "npm install && npm run dev"'
-                }
             }
         }
 
@@ -62,8 +42,7 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 echo 'Starting Django backend...'
-                // Запуск backend в фоне, чтобы фронтенд и бэкенд работали одновременно
-                bat 'start /B cmd /c "%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"'
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
@@ -71,9 +50,6 @@ pipeline {
     post {
         always {
             echo 'Pipeline finished.'
-            // Останавливаем все node и python процессы, если нужно
-            // bat 'taskkill /F /IM node.exe'
-            // bat 'taskkill /F /IM python.exe'
         }
         success {
             echo 'Build and tests succeeded!'
