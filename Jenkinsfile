@@ -8,21 +8,17 @@ pipeline {
         PATH = "${NODE_HOME};${env.PATH}"
     }
 
-    triggers {
-        githubPush() // автозапуск на каждый коммит
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
         stage('Setup Python Environment') {
             steps {
-                echo 'Setting up Python virtual environment...'
+                echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install --upgrade pip"
                 bat "\"%VENV_DIR%\\Scripts\\python.exe\" -m pip install -r requirements.txt"
@@ -36,24 +32,17 @@ pipeline {
             }
         }
 
-        stage('Deploy Backend as Daemon') {
+        stage('Collect Django Static Files') {
             steps {
-                echo 'Starting Django backend as daemon...'
-                // Логи бэкенда будут сохраняться в backend.log
-                bat "start /B %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000 > backend.log 2>&1"
+                echo 'Collecting Django static files...'
+                bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy Frontend as Daemon') {
+        stage('Deploy Backend') {
             steps {
-                dir('plane') {
-                    echo 'Installing frontend dependencies...'
-                    bat "npm install"
-
-                    echo 'Starting frontend dev-server as daemon...'
-                    // Логи фронта в frontend.log
-                    bat "start /B npm run dev > frontend.log 2>&1"
-                }
+                echo 'Starting Django backend...'
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
@@ -63,7 +52,7 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build and deploy succeeded!'
+            echo 'Build and tests succeeded!'
         }
         failure {
             echo 'Build or tests failed!'
