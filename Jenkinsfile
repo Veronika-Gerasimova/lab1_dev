@@ -8,15 +8,19 @@ pipeline {
         PATH = "${NODE_HOME};${env.PATH}"
     }
 
+    triggers {
+        githubPush()  // запуск при пуше
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
-        stage('Setup Python Environment') {
+        stage('Backend Setup') {
             steps {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
@@ -25,37 +29,35 @@ pipeline {
             }
         }
 
-        stage('Run Django Tests') {
+        stage('Run Tests') {
             steps {
-                echo 'Running Django tests...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
-        stage('Collect Django Static Files') {
+        stage('Frontend Build') {
             steps {
-                echo 'Collecting Django static files...'
+                dir('plane') {
+                    bat 'npm install'
+                    bat 'npm run build'
+                }
+            }
+        }
+
+        stage('Collect Static') {
+            steps {
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy Backend') {
+        stage('Deploy') {
             steps {
-                echo 'Starting Django backend...'
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                echo "Restarting backend..."
+                // убиваем старый процесс runserver (например через taskkill)
+                bat 'taskkill /F /IM python.exe || exit 0'
+                // запускаем заново
+                bat "start cmd /c %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline finished.'
-        }
-        success {
-            echo 'Build and tests succeeded!'
-        }
-        failure {
-            echo 'Build or tests failed!'
         }
     }
 }
