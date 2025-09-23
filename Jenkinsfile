@@ -42,7 +42,19 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 echo 'Starting Django backend...'
-                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
+                bat "start /B \"Django Backend\" cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                dir('plane') {
+                    echo 'Installing frontend dependencies...'
+                    bat "npm install"
+
+                    echo 'Starting frontend (React/Vue) as daemon...'
+                    bat "start /B \"Frontend\" cmd /c npm run dev"
+                }
             }
         }
     }
