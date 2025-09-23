@@ -8,19 +8,15 @@ pipeline {
         PATH = "${NODE_HOME};${env.PATH}"
     }
 
-    triggers {
-        githubPush()  // запуск при пуше
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
-        stage('Backend Setup') {
+        stage('Setup Python Environment') {
             steps {
                 echo 'Setting up virtual environment...'
                 bat "\"%PYTHON_PATH%\" -m venv %VENV_DIR%"
@@ -29,35 +25,48 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Django Tests') {
             steps {
+                echo 'Running Django tests...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py test"
             }
         }
 
-        stage('Frontend Build') {
+        stage('Collect Django Static Files') {
             steps {
-                dir('plane') {
-                    bat 'npm install'
-                    bat 'npm run build'
-                }
-            }
-        }
-
-        stage('Collect Static') {
-            steps {
+                echo 'Collecting Django static files...'
                 bat "%VENV_DIR%\\Scripts\\python.exe manage.py collectstatic --noinput"
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Backend') {
             steps {
-                echo "Restarting backend..."
-                // убиваем старый процесс runserver (например через taskkill)
-                bat 'taskkill /F /IM python.exe || exit 0'
-                // запускаем заново
-                bat "start cmd /c %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"
+                echo 'Starting Django backend...'
+                bat "start /B %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"
             }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                dir('plane') {
+                    echo 'Installing frontend dependencies...'
+                    bat "npm install"
+                    echo 'Starting frontend (npm run dev)...'
+                    bat "start /B npm run dev"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Build and tests succeeded!'
+        }
+        failure {
+            echo 'Build or tests failed!'
         }
     }
 }
