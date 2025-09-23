@@ -32,6 +32,17 @@ pipeline {
             }
         }
 
+        stage('Build Frontend') {
+            steps {
+                dir('plane') {
+                    echo 'Installing frontend dependencies...'
+                    bat "npm install"
+                    echo 'Building frontend...'
+                    bat "npm run build"
+                }
+            }
+        }
+
         stage('Collect Django Static Files') {
             steps {
                 echo 'Collecting Django static files...'
@@ -43,17 +54,6 @@ pipeline {
             steps {
                 echo 'Starting Django backend...'
                 bat "start /B %VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000"
-            }
-        }
-
-        stage('Deploy Frontend') {
-            steps {
-                dir('plane') {
-                    echo 'Installing frontend dependencies...'
-                    bat "npm install"
-                    echo 'Starting frontend (npm run dev)...'
-                    bat "start /B npm run dev"
-                }
             }
         }
     }
