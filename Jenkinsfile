@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Cloning repository..."
-                git branch: 'main', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
+                git branch: 'feature/new-feature', url: 'https://github.com/Veronika-Gerasimova/lab1_dev', credentialsId: 'github-token'
             }
         }
 
@@ -42,19 +42,7 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 echo 'Starting Django backend...'
-                bat "start /B \"Django Backend\" cmd /c \"%VENV_DIR%\\Scripts\\python.exe manage.py runserver 0.0.0.0:8000\""
-            }
-        }
-
-        stage('Deploy Frontend') {
-            steps {
-                dir('plane') {
-                    echo 'Installing frontend dependencies...'
-                    bat "npm install"
-
-                    echo 'Starting frontend (React/Vue) as daemon...'
-                    bat "start /B \"Frontend\" cmd /c npm run dev"
-                }
+                bat "\"%VENV_DIR%\\Scripts\\python.exe\" manage.py runserver 0.0.0.0:8000"
             }
         }
     }
